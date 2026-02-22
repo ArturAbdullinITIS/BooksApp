@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BooksResponse(
     @SerialName("items")
-    val items: List<BookResponse>,
+    val items: List<BookResponse>?,
     @SerialName("totalItems")
     val totalItems: Int
 )
@@ -29,7 +29,11 @@ data class VolumeInfoResponse(
     @SerialName("description")
     val description: String?,
     @SerialName("imageLinks")
-    val imageLinks: ImageLinksResponse?
+    val imageLinks: ImageLinksResponse?,
+    @SerialName("pageCount")
+    val pageCount: Integer,
+    @SerialName("averageRating")
+    val averageRating: Double?
 )
 @Serializable
 data class ImageLinksResponse(

@@ -2,6 +2,9 @@ package com.example.data.di
 
 import com.example.data.BuildConfig
 import com.example.data.remote.api.BooksApiService
+import com.example.data.remote.repository.BookRepositoryImpl
+import com.example.domain.repository.BookRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,4 +60,10 @@ interface NetworkModule {
             return retrofit.create(BooksApiService::class.java)
         }
     }
+
+    @Binds
+    @Singleton
+    fun bindBookRepository(
+        impl: BookRepositoryImpl
+    ): BookRepository
 }
