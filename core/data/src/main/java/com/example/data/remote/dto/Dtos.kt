@@ -31,7 +31,7 @@ data class VolumeInfoResponse(
     @SerialName("imageLinks")
     val imageLinks: ImageLinksResponse?,
     @SerialName("pageCount")
-    val pageCount: Integer,
+    val pageCount: Int,
     @SerialName("averageRating")
     val averageRating: Double?
 )
