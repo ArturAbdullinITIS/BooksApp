@@ -54,7 +54,6 @@ android {
 dependencies {
     // Hilt
     implementation(libs.hilt.android)
-    testImplementation(libs.junit.jupiter)
     ksp(libs.hilt.android.compiler)
     // Network
     implementation(libs.retrofit)
@@ -70,6 +69,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.jupiter)
+
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
