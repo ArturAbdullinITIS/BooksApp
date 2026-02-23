@@ -54,6 +54,7 @@ android {
 dependencies {
     // Hilt
     implementation(libs.hilt.android)
+    testImplementation(libs.junit.jupiter)
     ksp(libs.hilt.android.compiler)
     // Network
     implementation(libs.retrofit)
@@ -63,11 +64,16 @@ dependencies {
     // Domain Module
     implementation(project(path = ":core:domain"))
 
+    // Test
+    testImplementation(libs.mockk)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.kotlinx.coroutines.test)
+
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+
 }
