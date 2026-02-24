@@ -1,5 +1,8 @@
 package com.example.booksapp.ui.screen.main
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -15,5 +18,11 @@ private fun MainContent(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    // main screen ui content
+    Scaffold { innerPadding ->
+        Column(
+            modifier = modifier.padding(innerPadding)
+        ) {
+
+        }
+    }
 }

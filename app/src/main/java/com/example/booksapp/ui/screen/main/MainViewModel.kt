@@ -3,11 +3,9 @@ package com.example.booksapp.ui.screen.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.Book
-import com.example.domain.usecase.GetBookDetailsUseCase
 import com.example.domain.usecase.SearchBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
