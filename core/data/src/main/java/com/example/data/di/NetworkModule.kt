@@ -61,9 +61,5 @@ interface NetworkModule {
         }
     }
 
-    @Binds
-    @Singleton
-    fun bindBookRepository(
-        impl: BookRepositoryImpl
-    ): BookRepository
+
 }
