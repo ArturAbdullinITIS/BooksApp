@@ -75,4 +75,20 @@ class BookRepositoryImplTest {
         assertEquals(3, response.getOrNull()?.size)
         assertEquals("123", response.getOrNull()?.get(0)?.id)
     }
+
+    @Test
+    fun `searchBooks returns empty list when no items found`() = runTest {
+        val fakeResponse = BooksResponse(
+            items = emptyList(),
+            totalItems = 0
+        )
+        coEvery {
+            apiService.searchBooks("test")
+        } returns fakeResponse
+
+        val response = repository.searchBooks("test")
+
+        assertTrue(response.isSuccess)
+        assertTrue(response.getOrNull()?.isEmpty() ?: false)
+    }
 }
