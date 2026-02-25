@@ -1,9 +1,13 @@
 package com.example.booksapp.ui.screen.main
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.util.CoilUtils.result
+import com.example.booksapp.R
 import com.example.booksapp.ui.screen.main.MainState.*
+import com.example.booksapp.util.ResourceProvider
 import com.example.domain.model.Book
 import com.example.domain.usecase.SearchBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
+    private val resourceProvider: ResourceProvider
 ): ViewModel(){
     private val _state = MutableStateFlow<MainState>(MainState.Initial)
     val state = _state.asStateFlow()
@@ -29,7 +34,13 @@ class MainViewModel @Inject constructor(
             is MainCommand.SearchBooks -> {
                 viewModelScope.launch {
                     _state.update {
-                        MainState.Searching
+                        Searching
+                    }
+                    if (_query.value.isBlank()) {
+                        _state.update {
+                            Success(emptyList())
+                        }
+                        return@launch
                     }
                     val result = searchBooksUseCase(command.query)
                     if(result.isSuccess) {
@@ -38,7 +49,7 @@ class MainViewModel @Inject constructor(
                         }
                     } else {
                         _state.update {
-                            Error(result.exceptionOrNull()?.message ?: "Unknown error")
+                            Error(result.exceptionOrNull()?.message ?: resourceProvider.getString(R.string.unknown_error))
                         }
                     }
                 }
