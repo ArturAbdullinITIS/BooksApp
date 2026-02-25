@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">BooksApp</string>
     <string name="go_to_details">Go to details</string>
+    <string name="search">Search</string>
+    <string name="clear_icon">Clear Icon</string>
+    <string name="search_icon">Search Icon</string>
 </resources>
