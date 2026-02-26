@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">BooksApp</string>
     <string name="go_to_details">Go to details</string>
+    <string name="search">Search</string>
+    <string name="clear_icon">Clear Icon</string>
+    <string name="search_icon">Search Icon</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="what_book_are_you_interested_in">What book are you interested in?</string>
+    <string name="nothing_found">Nothing found!</string>
+    <string name="type_book_name">Type any book name</string>
 </resources>

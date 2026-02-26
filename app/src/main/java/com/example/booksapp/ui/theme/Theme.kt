@@ -18,8 +18,8 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
+    primary = Orange50,
+    secondary = Yellow50,
     tertiary = Pink40
 
     /* Other default colors to override
@@ -37,7 +37,7 @@ private val LightColorScheme = lightColorScheme(
 fun BooksAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

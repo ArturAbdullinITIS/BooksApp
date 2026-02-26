@@ -1,5 +1,6 @@
 package com.example.booksapp.ui.screen.main
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,27 +8,35 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,37 +45,26 @@ import com.example.booksapp.R
 
 
 @Composable
-@Preview
-fun BookItemPreview() {
-    BookItem(
-        title = "Sample Book Title LOooooooooooooooooooooooooooooooo",
-        authors = listOf("Author One", "Author Two"),
-        thumbnail = null,
-        pageCount = 350,
-        averageRating = 4.5
-    )
-
-}
-
-@Composable
 fun BookItem(
     title: String,
     authors: List<String>?,
     thumbnail: String?,
     pageCount: Int,
-    averageRating: Double?
+    averageRating: Double?,
+    onClick: () -> Unit
 ) {
     val imageModel = when {
-        thumbnail.isNullOrEmpty() == true -> R.drawable.ic_no_image_placeholder
+        thumbnail.isNullOrEmpty() -> R.drawable.ic_no_image_placeholder
         else -> thumbnail
     }
     Card(
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(16.dp),
+            .padding(16.dp)
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 4.dp
         ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -127,4 +125,56 @@ fun BookItem(
             )
         }
     }
+}
+
+@Composable
+fun SearchField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSearch: () -> Unit
+) {
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .onKeyEvent { keyEvent ->
+                if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
+                    onSearch()
+                    true
+                } else {
+                    false
+                }
+            },
+        value = value,
+        onValueChange = onValueChange,
+        shape = RoundedCornerShape(16.dp),
+        label = {
+            Text(
+                text = stringResource(R.string.search)
+            )
+        },
+        placeholder = {
+            Text(
+                text = stringResource(R.string.type_book_name)
+            )
+        },
+        trailingIcon = {
+            IconButton(
+                onClick = onSearch,
+                colors = IconButtonDefaults.iconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = stringResource(R.string.search_icon),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Search
+        )
+    )
 }
