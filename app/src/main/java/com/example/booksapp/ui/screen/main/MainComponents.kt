@@ -34,6 +34,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -62,7 +63,8 @@ fun BookItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag("book_item"),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
@@ -137,6 +139,7 @@ fun SearchField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .testTag("search_field")
             .onKeyEvent { keyEvent ->
                 if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
                     onSearch()
@@ -160,6 +163,7 @@ fun SearchField(
         },
         trailingIcon = {
             IconButton(
+                modifier = Modifier.testTag("search_button"),
                 onClick = onSearch,
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.onSurface

@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.booksapp.R
@@ -55,6 +56,7 @@ private fun MainContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
+                            modifier = Modifier.testTag("error_message"),
                             text = currentState.message,
                             style = MaterialTheme.typography.bodyLarge
                         )
@@ -66,6 +68,7 @@ private fun MainContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
+                            modifier = Modifier.testTag("initial_message"),
                             text = stringResource(R.string.what_book_are_you_interested_in),
                             style = MaterialTheme.typography.bodyLarge
                         )
@@ -76,12 +79,16 @@ private fun MainContent(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(
+                            modifier = Modifier.testTag("progress_indicator")
+                        )
                     }
                 }
                 is MainState.Success -> {
                     if(currentState.books.isNotEmpty()) {
-                        LazyColumn {
+                        LazyColumn(
+                            modifier = Modifier.testTag("books_list")
+                        ) {
                             items(
                                 items = currentState.books,
                                 key = { book -> book.id }
@@ -104,6 +111,7 @@ private fun MainContent(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
+                                modifier = Modifier.testTag("nothing_found_message"),
                                 text = stringResource(R.string.nothing_found),
                                 style = MaterialTheme.typography.bodyLarge
                             )
