@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.booksapp.ui.navigation.CustomNavHost
 import com.example.booksapp.ui.screen.main.BookItem
 import com.example.booksapp.ui.screen.main.MainScreen
 import com.example.booksapp.ui.theme.BooksAppTheme
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BooksAppTheme {
-                MainScreen()
+                CustomNavHost()
             }
         }
     }

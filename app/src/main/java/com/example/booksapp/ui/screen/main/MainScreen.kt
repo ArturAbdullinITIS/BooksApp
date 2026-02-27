@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -21,13 +22,16 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.booksapp.R
 
 @Composable
-fun MainScreen() {
-    MainContent()
+fun MainScreen(
+    onNavigateToDetails: (String) -> Unit
+) {
+    MainContent(onNavigateToDetails)
 }
 
 
 @Composable
 private fun MainContent(
+    onNavigateToDetails: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel()
 ) {
@@ -89,10 +93,10 @@ private fun MainContent(
                         LazyColumn(
                             modifier = Modifier.testTag("books_list")
                         ) {
-                            items(
+                            itemsIndexed(
                                 items = currentState.books,
-                                key = { book -> book.id }
-                            ) { book ->
+                                key = { index, book -> book.id }
+                            ) { index, book ->
                                 BookItem(
                                     title = book.title,
                                     authors = book.authors,
@@ -100,7 +104,7 @@ private fun MainContent(
                                     pageCount = book.pageCount,
                                     averageRating = book.averageRating,
                                     onClick = {
-
+                                        onNavigateToDetails(book.id)
                                     }
                                 )
                             }
