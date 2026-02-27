@@ -3,10 +3,11 @@ package com.example.booksapp.ui.screen.main
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.booksapp.R
 
@@ -28,7 +30,6 @@ fun MainScreen(
     MainContent(onNavigateToDetails)
 }
 
-
 @Composable
 private fun MainContent(
     onNavigateToDetails: (String) -> Unit,
@@ -37,6 +38,7 @@ private fun MainContent(
 ) {
     val state by viewModel.state.collectAsState()
     val query by viewModel.query.collectAsState()
+
     Scaffold { innerPadding ->
         Column(
             modifier = modifier
@@ -53,7 +55,7 @@ private fun MainContent(
                     viewModel.processCommand(MainCommand.SearchBooks(query))
                 }
             )
-            when(val currentState = state) {
+            when (val currentState = state) {
                 is MainState.Error -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -89,24 +91,45 @@ private fun MainContent(
                     }
                 }
                 is MainState.Success -> {
-                    if(currentState.books.isNotEmpty()) {
+                    if (currentState.books.isNotEmpty()) {
                         LazyColumn(
                             modifier = Modifier.testTag("books_list")
                         ) {
                             itemsIndexed(
                                 items = currentState.books,
-                                key = { index, book -> book.id }
-                            ) { index, book ->
+                                key = { index, book -> "${index}_${book.id}" }
+                            ) { _, book ->
                                 BookItem(
                                     title = book.title,
                                     authors = book.authors,
                                     thumbnail = book.thumbnail,
                                     pageCount = book.pageCount,
                                     averageRating = book.averageRating,
-                                    onClick = {
-                                        onNavigateToDetails(book.id)
-                                    }
+                                    onClick = { onNavigateToDetails(book.id) }
                                 )
+                            }
+
+                            if (currentState.hasMorePages) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 12.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (currentState.isLoadingNextPage) {
+                                            CircularProgressIndicator()
+                                        } else {
+                                            Button(
+                                                onClick = {
+                                                    viewModel.processCommand(MainCommand.LoadNextPage)
+                                                }
+                                            ) {
+                                                Text(text = stringResource(R.string.load_more))
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else {

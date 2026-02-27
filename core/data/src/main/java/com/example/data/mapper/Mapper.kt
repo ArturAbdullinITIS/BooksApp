@@ -9,7 +9,7 @@ fun BookResponse.toDomainModel(): Book {
         title = this.volumeInfo.title,
         authors = this.volumeInfo.authors,
         description = this.volumeInfo.description,
-        thumbnail = volumeInfo.imageLinks?.thumbnail?.replace("http://", "https://"),
+        thumbnail = volumeInfo.imageLinks?.thumbnail?.replace("http://", "https://") ?: "",
         smallThumbnail = this.volumeInfo.imageLinks?.smallThumbnail ?: "",
         pageCount = this.volumeInfo.pageCount,
         averageRating = this.volumeInfo.averageRating,

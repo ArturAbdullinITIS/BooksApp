@@ -5,13 +5,18 @@ import com.example.data.remote.api.BooksApiService
 import com.example.domain.model.Book
 import com.example.domain.repository.BookRepository
 import javax.inject.Inject
+import kotlin.math.max
 
 class BookRepositoryImpl @Inject constructor(
     private val booksApiService: BooksApiService
 ): BookRepository{
-    override suspend fun searchBooks(query: String): Result<List<Book>> {
+    override suspend fun searchBooks(
+        query: String,
+        startIndex: Int,
+        maxResults: Int
+    ): Result<List<Book>> {
         return try {
-            val response = booksApiService.searchBooks(query)
+            val response = booksApiService.searchBooks(query, maxResults, startIndex)
             val books = response.items?.map { it.toDomainModel() } ?: emptyList()
             Result.success(books)
         } catch (e: Exception) {

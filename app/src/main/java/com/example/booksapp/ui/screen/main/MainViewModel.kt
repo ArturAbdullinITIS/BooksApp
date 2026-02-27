@@ -1,10 +1,7 @@
 package com.example.booksapp.ui.screen.main
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil3.util.CoilUtils.result
 import com.example.booksapp.R
 import com.example.booksapp.ui.screen.main.MainState.*
 import com.example.booksapp.util.ResourceProvider
@@ -17,69 +14,110 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val PAGE_SIZE = 20
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
     private val resourceProvider: ResourceProvider
-): ViewModel(){
+) : ViewModel() {
     private val _state = MutableStateFlow<MainState>(MainState.Initial)
     val state = _state.asStateFlow()
 
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
+    private var currentQuery = ""
+    private var currentPage = 0
+    private var isLoadingMore = false
+    private var hasMorePages = true
+    private val allBooks = mutableListOf<Book>()
+
     fun processCommand(command: MainCommand) {
-        when(command) {
+        when (command) {
             is MainCommand.SearchBooks -> {
-                viewModelScope.launch {
-                    _state.update {
-                        Searching
-                    }
-                    if (_query.value.isBlank()) {
-                        _state.update {
-                            Success(emptyList())
-                        }
-                        return@launch
-                    }
-                    val result = searchBooksUseCase(command.query)
-                    if(result.isSuccess) {
-                        _state.update {
-                            Success(result.getOrDefault(emptyList()))
-                        }
-                    } else {
-                        _state.update {
-                            Error(result.exceptionOrNull()?.message ?: resourceProvider.getString(R.string.unknown_error))
-                        }
-                    }
+                currentQuery = command.query
+                currentPage = 0
+                hasMorePages = true
+                allBooks.clear()
+                loadBooks(isFirstPage = true)
+            }
+            MainCommand.LoadNextPage -> {
+                if (!isLoadingMore && hasMorePages) {
+                    loadBooks(isFirstPage = false)
+                }
+            }
+            MainCommand.ClearInput -> {
+                _query.update { "" }
+            }
+            is MainCommand.InputQuery -> {
+                _query.update { command.query }
+            }
+        }
+    }
+
+    private fun loadBooks(isFirstPage: Boolean) {
+        viewModelScope.launch {
+            if (isFirstPage) {
+                _state.update { Searching }
+            } else {
+                val current = _state.value
+                if (current is Success) {
+                    _state.update { current.copy(isLoadingNextPage = true) }
                 }
             }
 
-            MainCommand.ClearInput -> {
-                _query.update {
-                    ""
+            if (currentQuery.isBlank()) {
+                allBooks.clear()
+                _state.update { Success(books = emptyList()) }
+                return@launch
+            }
+
+            isLoadingMore = true
+            val startIndex = currentPage * PAGE_SIZE
+            val result = searchBooksUseCase(currentQuery, startIndex, PAGE_SIZE)
+
+            if (result.isSuccess) {
+                val newBooks = result.getOrDefault(emptyList())
+                if (newBooks.size < PAGE_SIZE) hasMorePages = false
+                if (newBooks.isNotEmpty()) {
+                    currentPage++
+                    allBooks.addAll(newBooks)
+                }
+                _state.update {
+                    Success(
+                        books = allBooks.toList(),
+                        isLoadingNextPage = false,
+                        hasMorePages = hasMorePages
+                    )
+                }
+            } else {
+                _state.update {
+                    Error(
+                        result.exceptionOrNull()?.message
+                            ?: resourceProvider.getString(R.string.unknown_error)
+                    )
                 }
             }
-            is MainCommand.InputQuery -> {
-                _query.update {
-                    command.query
-                }
-            }
+            isLoadingMore = false
         }
     }
 }
 
-
 sealed interface MainCommand {
-    data class InputQuery(val query: String): MainCommand
-    object ClearInput: MainCommand
-    data class SearchBooks(val query: String): MainCommand
-
+    data class InputQuery(val query: String) : MainCommand
+    object ClearInput : MainCommand
+    data class SearchBooks(val query: String) : MainCommand
+    object LoadNextPage : MainCommand
 }
 
 sealed class MainState {
-    object Initial: MainState()
-    object Searching: MainState()
-    data class Success(val books: List<Book>): MainState()
-    data class Error(val message: String): MainState()
+    object Initial : MainState()
+    object Searching : MainState()
+    data class Success(
+        val books: List<Book>,
+        val isLoadingNextPage: Boolean = false,
+        val hasMorePages: Boolean = true
+    ) : MainState()
+    data class Error(val message: String) : MainState()
 }
