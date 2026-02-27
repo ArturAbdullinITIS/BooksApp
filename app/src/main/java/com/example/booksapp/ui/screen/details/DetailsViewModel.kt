@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = DetailsViewModel.Factory::class)
 class DetailsViewModel @AssistedInject constructor(
     private val getBookDetailsUseCase: GetBookDetailsUseCase,
     @Assisted("bookId") private val bookId: String
@@ -44,7 +44,7 @@ class DetailsViewModel @AssistedInject constructor(
                 _state.update { state ->
                     state.copy(
                         isLoading = false,
-                        errorMessage = result.exceptionOrNull()?.message ?: "Unknown Error"
+                        errorMessage = result.exceptionOrNull()?.message
                     )
                 }
             }
@@ -55,7 +55,7 @@ class DetailsViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             @Assisted("bookId") bookId: String
-        )
+        ): DetailsViewModel
     }
 }
 
