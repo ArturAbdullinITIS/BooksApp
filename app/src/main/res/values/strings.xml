@@ -9,4 +9,9 @@
     <string name="nothing_found">Nothing found!</string>
     <string name="type_book_name">Type any book name</string>
     <string name="arrow_back">Arrow back</string>
+    <string name="add_to_favourites_button">Add to Favourites button</string>
+    <string name="add_book_to_favourites">Add book to Favourites</string>
+    <string name="unknown_title">Unknown Title</string>
+    <string name="unknown_author">Unknown Author</string>
+    <string name="no_description">No Description</string>
 </resources>
