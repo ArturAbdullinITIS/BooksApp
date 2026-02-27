@@ -1,15 +1,27 @@
 package com.example.booksapp.ui.screen.details
 
+import android.R.attr.fontWeight
+import android.R.attr.text
 import android.graphics.Paint
+import android.graphics.fonts.Font
+import android.net.TetheringManager
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,9 +36,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.booksapp.R
+import kotlin.math.acos
 
 
 @Composable
@@ -42,12 +56,14 @@ private fun DetailsContent(
     bookId: String,
     onBack: () -> Unit,
     viewModel: DetailsViewModel = hiltViewModel(
+        key = bookId,
         creationCallback = { factory: DetailsViewModel.Factory ->
             factory.create(bookId = bookId)
         }
     )
 ) {
     val state by viewModel.state.collectAsState()
+    val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -74,6 +90,9 @@ private fun DetailsContent(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .padding(16.dp)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if(state.isLoading) {
                 Box(
@@ -88,7 +107,7 @@ private fun DetailsContent(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = state.errorMessage?: "Unknown Error",
+                        text = state.errorMessage?: stringResource(R.string.unknown_error),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
@@ -96,21 +115,35 @@ private fun DetailsContent(
                 BookImage(
                     imageUrl = state.bookItem?.thumbnail
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = state.bookItem?.title ?: "Unknown Title",
-                    style = MaterialTheme.typography.titleMedium
+                    text = state.bookItem?.title ?: stringResource(R.string.unknown_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = state.bookItem?.authors?.joinToString(", ") ?: "Unknown Author",
+                    text = state.bookItem?.authors?.joinToString(", ") ?: stringResource(R.string.unknown_author),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = state.bookItem?.description ?: stringResource(R.string.no_description),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = state.bookItem?.description ?: "Unknown Descriptions",
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = {
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_to_favourites_button)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.add_book_to_favourites)
+                    )
+                }
             }
         }
     }
