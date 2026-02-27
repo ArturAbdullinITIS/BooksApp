@@ -17,5 +17,5 @@ private fun DetailsContent(
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = hiltViewModel()
 ) {
-    // details screen ui content
+
 }
