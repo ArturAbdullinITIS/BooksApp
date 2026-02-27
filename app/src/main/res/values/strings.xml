@@ -14,4 +14,5 @@
     <string name="unknown_title">Unknown Title</string>
     <string name="unknown_author">Unknown Author</string>
     <string name="no_description">No Description</string>
+    <string name="load_more">Load more</string>
 </resources>
