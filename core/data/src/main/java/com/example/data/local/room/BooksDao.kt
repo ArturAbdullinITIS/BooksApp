@@ -18,4 +18,7 @@ interface BooksDao {
 
     @Query("Select * from books")
     fun getAllFavourites(): Flow<List<BookDataModel>>
+
+    @Query("Delete from books where id = :bookId")
+    suspend fun deleteBookFromFavourites(bookId: String)
 }

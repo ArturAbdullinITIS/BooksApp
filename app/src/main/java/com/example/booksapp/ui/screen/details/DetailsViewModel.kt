@@ -1,11 +1,10 @@
 package com.example.booksapp.ui.screen.details
 
-import android.R.attr.data
-import android.util.Log.e
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.Book
+import com.example.domain.usecase.DeleteBookFromFavouritesUseCase
+import com.example.domain.usecase.GetAllFavouritesUseCase
 import com.example.domain.usecase.GetBookDetailsUseCase
 import com.example.domain.usecase.SaveBookToFavouritesUseCase
 import dagger.assisted.Assisted
@@ -13,20 +12,29 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
 @HiltViewModel(assistedFactory = DetailsViewModel.Factory::class)
 class DetailsViewModel @AssistedInject constructor(
     private val getBookDetailsUseCase: GetBookDetailsUseCase,
     private val saveBookToFavouritesUseCase: SaveBookToFavouritesUseCase,
+    private val getAllFavouritesUseCase: GetAllFavouritesUseCase,
+    private val deleteBookFromFavouritesUseCase: DeleteBookFromFavouritesUseCase,
     @Assisted("bookId") private val bookId: String
 ): ViewModel(){
     private val _state = MutableStateFlow(DetailsState())
     val state = _state.asStateFlow()
+
+    val favouriteBooks = getAllFavouritesUseCase().stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        emptyList()
+    )
 
     init {
         viewModelScope.launch {
@@ -61,6 +69,12 @@ class DetailsViewModel @AssistedInject constructor(
                     saveBookToFavouritesUseCase(command.book)
                 }
             }
+
+            is DetailsCommand.DeleteBookFromFavourites -> {
+                viewModelScope.launch {
+                    deleteBookFromFavouritesUseCase(command.bookId)
+                }
+            }
         }
     }
 
@@ -74,6 +88,7 @@ class DetailsViewModel @AssistedInject constructor(
 
 sealed interface DetailsCommand {
     data class SaveBookToFavourites(val book: Book): DetailsCommand
+    data class DeleteBookFromFavourites(val bookId: String): DetailsCommand
 }
 
 

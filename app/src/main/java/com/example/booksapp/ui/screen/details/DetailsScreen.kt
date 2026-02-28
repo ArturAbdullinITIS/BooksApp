@@ -40,7 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.booksapp.R
+import kotlinx.coroutines.flow.compose
 import kotlin.math.acos
 
 
@@ -65,6 +67,7 @@ private fun DetailsContent(
 ) {
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
+    val favouriteBooks by viewModel.favouriteBooks.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -135,22 +138,15 @@ private fun DetailsContent(
                         text = book.description ?: stringResource(R.string.no_description),
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        onClick = {
+                    AnimatedButton(
+                        isFavourite = favouriteBooks.any { it.id == bookId },
+                        onAdd = {
                             viewModel.processCommand(DetailsCommand.SaveBookToFavourites(book))
+                        },
+                        onDelete = {
+                            viewModel.processCommand(DetailsCommand.DeleteBookFromFavourites(bookId))
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.add_to_favourites_button)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = stringResource(R.string.add_book_to_favourites)
-                        )
-                    }
+                    )
                 }
             }
         }
