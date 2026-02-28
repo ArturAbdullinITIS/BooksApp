@@ -56,4 +56,5 @@ class MapperTest {
         assertEquals("", book.thumbnail)
         assertEquals("", book.smallThumbnail)
     }
+
 }

@@ -6,26 +6,41 @@ import com.example.booksapp.R
 import com.example.booksapp.ui.screen.main.MainState.*
 import com.example.booksapp.util.ResourceProvider
 import com.example.domain.model.Book
+import com.example.domain.usecase.GetAllFavouritesUseCase
 import com.example.domain.usecase.SearchBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.emptyList
+import kotlin.collections.listOf
 
 private const val PAGE_SIZE = 20
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
-    private val resourceProvider: ResourceProvider
+    private val resourceProvider: ResourceProvider,
+    private val getAllFavouritesUseCase: GetAllFavouritesUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow<MainState>(MainState.Initial)
+    private val _state = MutableStateFlow<MainState>(Initial)
     val state = _state.asStateFlow()
 
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
+
+    val favouriteBooks = getAllFavouritesUseCase().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
+
+
 
     private var currentQuery = ""
     private var currentPage = 0

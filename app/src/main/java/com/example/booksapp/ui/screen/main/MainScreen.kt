@@ -100,6 +100,7 @@ private fun MainContent(
                                 key = { index, book -> "${index}_${book.id}" }
                             ) { _, book ->
                                 BookItem(
+                                    isSavedToFavourites = ,
                                     title = book.title,
                                     authors = book.authors,
                                     thumbnail = book.thumbnail,
