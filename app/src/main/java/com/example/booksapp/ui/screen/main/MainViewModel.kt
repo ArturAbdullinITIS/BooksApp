@@ -3,16 +3,21 @@ package com.example.booksapp.ui.screen.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.booksapp.R
+import com.example.booksapp.ui.navigation.Main
 import com.example.booksapp.ui.screen.main.MainState.*
 import com.example.booksapp.util.ResourceProvider
 import com.example.domain.model.Book
+import com.example.domain.usecase.DeleteBookFromFavouritesUseCase
 import com.example.domain.usecase.GetAllFavouritesUseCase
+import com.example.domain.usecase.SaveBookToFavouritesUseCase
 import com.example.domain.usecase.SearchBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,7 +31,9 @@ private const val PAGE_SIZE = 20
 class MainViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
     private val resourceProvider: ResourceProvider,
-    private val getAllFavouritesUseCase: GetAllFavouritesUseCase
+    private val getAllFavouritesUseCase: GetAllFavouritesUseCase,
+    private val saveBookToFavouritesUseCase: SaveBookToFavouritesUseCase,
+    private val deleteBookFromFavouritesUseCase: DeleteBookFromFavouritesUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow<MainState>(Initial)
     val state = _state.asStateFlow()
@@ -67,6 +74,18 @@ class MainViewModel @Inject constructor(
             }
             is MainCommand.InputQuery -> {
                 _query.update { command.query }
+            }
+
+            is MainCommand.SaveBookToFavourites -> {
+                viewModelScope.launch {
+                    saveBookToFavouritesUseCase(command.book)
+                }
+            }
+
+            is MainCommand.DeleteBookFromFavourites -> {
+                viewModelScope.launch {
+                    deleteBookFromFavouritesUseCase(command.bookId)
+                }
             }
         }
     }
@@ -124,6 +143,8 @@ sealed interface MainCommand {
     object ClearInput : MainCommand
     data class SearchBooks(val query: String) : MainCommand
     object LoadNextPage : MainCommand
+    data class SaveBookToFavourites(val book: Book): MainCommand
+    data class DeleteBookFromFavourites(val bookId: String): MainCommand
 }
 
 sealed class MainState {

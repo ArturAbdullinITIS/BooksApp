@@ -24,4 +24,8 @@ class BookLocalRepositoryImpl @Inject constructor(
             list.map { it.toDomainModel() }
         }
     }
+
+    override suspend fun deleteBookFromFavourites(bookId: String) {
+        booksDao.deleteBookFromFavourites(bookId)
+    }
 }

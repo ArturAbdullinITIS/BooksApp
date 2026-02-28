@@ -9,7 +9,7 @@
     <string name="nothing_found">Nothing found!</string>
     <string name="type_book_name">Type any book name</string>
     <string name="arrow_back">Arrow back</string>
-    <string name="add_to_favourites_button">Add to Favourites button</string>
+    <string name="add_to_favourites_or_delete_button">Add to Favourites or delete button</string>
     <string name="add_book_to_favourites">Add book to Favourites</string>
     <string name="unknown_title">Unknown Title</string>
     <string name="unknown_author">Unknown Author</string>
@@ -17,4 +17,5 @@
     <string name="load_more">Load more</string>
     <string name="not_favourite_icon">Not Favourite Icon</string>
     <string name="favourite_icon">Favourite Icon</string>
+    <string name="delete_from_favourites">Delete from Favourites</string>
 </resources>

@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.booksapp.R
+import com.example.booksapp.ui.navigation.Main
 
 @Composable
 fun MainScreen(
@@ -38,6 +39,7 @@ private fun MainContent(
 ) {
     val state by viewModel.state.collectAsState()
     val query by viewModel.query.collectAsState()
+    val favouriteBooks by viewModel.favouriteBooks.collectAsState()
 
     Scaffold { innerPadding ->
         Column(
@@ -100,13 +102,21 @@ private fun MainContent(
                                 key = { index, book -> "${index}_${book.id}" }
                             ) { _, book ->
                                 BookItem(
-                                    isSavedToFavourites = ,
+                                    isSavedToFavourites = favouriteBooks.any {
+                                        it.id == book.id
+                                    },
                                     title = book.title,
                                     authors = book.authors,
                                     thumbnail = book.thumbnail,
                                     pageCount = book.pageCount,
                                     averageRating = book.averageRating,
-                                    onClick = { onNavigateToDetails(book.id) }
+                                    onClick = { onNavigateToDetails(book.id) },
+                                    onLongClick = {
+                                        if (!favouriteBooks.any {
+                                            it.id == book.id
+                                        }) viewModel.processCommand(MainCommand.SaveBookToFavourites(book))
+                                        else viewModel.processCommand(MainCommand.DeleteBookFromFavourites(book.id))
+                                    }
                                 )
                             }
 

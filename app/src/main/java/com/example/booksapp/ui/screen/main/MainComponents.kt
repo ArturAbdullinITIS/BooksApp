@@ -2,6 +2,7 @@ package com.example.booksapp.ui.screen.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
@@ -37,6 +39,8 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,7 +60,8 @@ fun BookItem(
     thumbnail: String?,
     pageCount: Int,
     averageRating: Double?,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
 ) {
     val imageModel = when {
         thumbnail.isNullOrEmpty() -> R.drawable.ic_no_image_placeholder
@@ -67,7 +72,10 @@ fun BookItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .testTag("book_item"),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -123,10 +131,23 @@ fun BookItem(
                     text = "$pageCount" + " pages",
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text(
-                    text = "Rating: ${averageRating ?: "N/A"}",
-                    style = MaterialTheme.typography.labelMedium
-                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = "Rating: ${averageRating ?: "N/A"}",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    Icon(
+                        imageVector = if (isSavedToFavourites) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (isSavedToFavourites) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(20.dp)
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
@@ -146,36 +167,27 @@ fun SearchField(
     onValueChange: (String) -> Unit,
     onSearch: () -> Unit
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .testTag("search_field")
-            .onKeyEvent { keyEvent ->
-                if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
-                    onSearch()
-                    true
-                } else {
-                    false
-                }
-            },
+            .testTag("search_field"),
         value = value,
         onValueChange = onValueChange,
         shape = RoundedCornerShape(16.dp),
-        label = {
-            Text(
-                text = stringResource(R.string.search)
-            )
-        },
-        placeholder = {
-            Text(
-                text = stringResource(R.string.type_book_name)
-            )
-        },
+        label = { Text(stringResource(R.string.search)) },
+        placeholder = { Text(stringResource(R.string.type_book_name)) },
         trailingIcon = {
             IconButton(
                 modifier = Modifier.testTag("search_button"),
-                onClick = onSearch,
+                onClick = {
+                    onSearch()
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                },
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
@@ -188,8 +200,13 @@ fun SearchField(
             }
         },
         maxLines = 1,
-        keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Search
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onSearch()
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            }
         )
     )
 }
