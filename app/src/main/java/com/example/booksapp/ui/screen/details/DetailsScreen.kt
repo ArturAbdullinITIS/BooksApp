@@ -35,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -94,55 +95,62 @@ private fun DetailsContent(
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            if(state.isLoading) {
+            if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
-            } else if(state.errorMessage != null) {
+            } else if (state.errorMessage != null) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = state.errorMessage?: stringResource(R.string.unknown_error),
+                        text = state.errorMessage ?: stringResource(R.string.unknown_error),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-            } else if(state.bookItem != null) {
-                BookImage(
-                    imageUrl = state.bookItem?.thumbnail
-                )
-                Text(
-                    text = state.bookItem?.title ?: stringResource(R.string.unknown_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = state.bookItem?.authors?.joinToString(", ") ?: stringResource(R.string.unknown_author),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = state.bookItem?.description ?: stringResource(R.string.no_description),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = {
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.add_to_favourites_button)
+            } else if (state.bookItem != null) {
+                state.bookItem?.let { book ->
+                    BookImage(
+                        imageUrl = book.thumbnail
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = stringResource(R.string.add_book_to_favourites)
+                        modifier = Modifier.testTag("title"),
+                        text = book.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
                     )
+                    Text(
+                        modifier = Modifier.testTag("authors"),
+                        text = book.authors?.joinToString(", ")
+                            ?: stringResource(R.string.unknown_author),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        modifier = Modifier.testTag("description"),
+                        text = book.description ?: stringResource(R.string.no_description),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        onClick = {
+                            viewModel.processCommand(DetailsCommand.SaveBookToFavourites(book))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.add_to_favourites_button)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.add_book_to_favourites)
+                        )
+                    }
                 }
             }
         }
