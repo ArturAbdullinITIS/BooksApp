@@ -1,5 +1,6 @@
 package com.example.data.mapper
 
+import com.example.data.local.BookDataModel
 import com.example.data.remote.dto.BookResponse
 import com.example.domain.model.Book
 
@@ -13,5 +14,16 @@ fun BookResponse.toDomainModel(): Book {
         smallThumbnail = this.volumeInfo.imageLinks?.smallThumbnail ?: "",
         pageCount = this.volumeInfo.pageCount,
         averageRating = this.volumeInfo.averageRating,
+    )
+}
+
+fun Book.toDataModel(): BookDataModel {
+    return BookDataModel(
+        id = id,
+        title = title,
+        authors = authors?.joinToString(", "),
+        description = description,
+        thumbnailUrl = thumbnail,
+        pageCount = pageCount,
     )
 }

@@ -1,11 +1,13 @@
 package com.example.booksapp.ui.screen.details
 
+import android.R.attr.data
 import android.util.Log.e
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.Book
 import com.example.domain.usecase.GetBookDetailsUseCase
+import com.example.domain.usecase.SaveBookToFavouritesUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel(assistedFactory = DetailsViewModel.Factory::class)
 class DetailsViewModel @AssistedInject constructor(
     private val getBookDetailsUseCase: GetBookDetailsUseCase,
+    private val saveBookToFavouritesUseCase: SaveBookToFavouritesUseCase,
     @Assisted("bookId") private val bookId: String
 ): ViewModel(){
     private val _state = MutableStateFlow(DetailsState())
@@ -51,6 +54,16 @@ class DetailsViewModel @AssistedInject constructor(
         }
     }
 
+    fun processCommand(command: DetailsCommand) {
+        when (command) {
+            is DetailsCommand.SaveBookToFavourites -> {
+                viewModelScope.launch {
+                    saveBookToFavouritesUseCase(command.book)
+                }
+            }
+        }
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(
@@ -60,6 +73,7 @@ class DetailsViewModel @AssistedInject constructor(
 }
 
 sealed interface DetailsCommand {
+    data class SaveBookToFavourites(val book: Book): DetailsCommand
 }
 
 

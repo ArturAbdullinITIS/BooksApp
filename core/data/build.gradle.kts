@@ -63,6 +63,12 @@ dependencies {
     // Domain Module
     implementation(project(path = ":core:domain"))
 
+    // Room
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+
+
     // Test
     testImplementation(libs.mockk)
     testImplementation(libs.junit)
