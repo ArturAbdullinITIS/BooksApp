@@ -38,6 +38,7 @@ private fun MainContent(
 ) {
     val state by viewModel.state.collectAsState()
     val query by viewModel.query.collectAsState()
+    val favouriteBooks by viewModel.favouriteBooks.collectAsState()
 
     Scaffold { innerPadding ->
         Column(
@@ -100,7 +101,9 @@ private fun MainContent(
                                 key = { index, book -> "${index}_${book.id}" }
                             ) { _, book ->
                                 BookItem(
-                                    isSavedToFavourites = ,
+                                    isSavedToFavourites = favouriteBooks.any {
+                                        it.id == book.id
+                                    },
                                     title = book.title,
                                     authors = book.authors,
                                     thumbnail = book.thumbnail,

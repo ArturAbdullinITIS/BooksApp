@@ -123,10 +123,23 @@ fun BookItem(
                     text = "$pageCount" + " pages",
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text(
-                    text = "Rating: ${averageRating ?: "N/A"}",
-                    style = MaterialTheme.typography.labelMedium
-                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Rating: ${averageRating ?: "N/A"}",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    Icon(
+                        imageVector = if (isSavedToFavourites) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = null,
+                        tint = if (isSavedToFavourites) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(20.dp)
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
