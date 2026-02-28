@@ -27,3 +27,16 @@ fun Book.toDataModel(): BookDataModel {
         pageCount = pageCount,
     )
 }
+
+fun BookDataModel.toDomainModel(): Book {
+    return Book(
+        id = id,
+        title = title,
+        authors = authors?.split(", "),
+        description = description,
+        thumbnail = thumbnailUrl,
+        smallThumbnail = thumbnailUrl,
+        pageCount = pageCount,
+        averageRating = null
+    )
+}

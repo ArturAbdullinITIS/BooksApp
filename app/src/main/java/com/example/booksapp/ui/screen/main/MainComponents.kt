@@ -1,5 +1,6 @@
 package com.example.booksapp.ui.screen.main
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,6 +50,7 @@ import com.example.booksapp.R
 
 @Composable
 fun BookItem(
+    isSavedToFavourites: Boolean,
     title: String,
     authors: List<String>?,
     thumbnail: String?,
@@ -70,7 +74,13 @@ fun BookItem(
         ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        border = if (isSavedToFavourites) {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+        } else {
+            null
+        }
+
     ) {
         Row(
             modifier = Modifier
@@ -102,6 +112,7 @@ fun BookItem(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+
                 Text(
                     text = authors?.joinToString(", ") ?: "Unknown Author",
                     style = MaterialTheme.typography.bodyMedium,
