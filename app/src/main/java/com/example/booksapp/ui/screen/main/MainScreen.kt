@@ -40,120 +40,127 @@ private fun MainContent(
     val state by viewModel.state.collectAsState()
     val query by viewModel.query.collectAsState()
     val favouriteBooks by viewModel.favouriteBooks.collectAsState()
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        SearchField(
+            value = query,
+            onValueChange = {
+                viewModel.processCommand(MainCommand.InputQuery(it))
+            },
+            onSearch = {
+                viewModel.processCommand(MainCommand.SearchBooks(query))
+            }
+        )
+        when (val currentState = state) {
+            is MainState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier.testTag("error_message"),
+                        text = currentState.message,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
 
-    Scaffold { innerPadding ->
-        Column(
-            modifier = modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            SearchField(
-                value = query,
-                onValueChange = {
-                    viewModel.processCommand(MainCommand.InputQuery(it))
-                },
-                onSearch = {
-                    viewModel.processCommand(MainCommand.SearchBooks(query))
+            MainState.Initial -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        modifier = Modifier.testTag("initial_message"),
+                        text = stringResource(R.string.what_book_are_you_interested_in),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
-            )
-            when (val currentState = state) {
-                is MainState.Error -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+            }
+
+            MainState.Searching -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.testTag("progress_indicator")
+                    )
+                }
+            }
+
+            is MainState.Success -> {
+                if (currentState.books.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier.testTag("books_list")
                     ) {
-                        Text(
-                            modifier = Modifier.testTag("error_message"),
-                            text = currentState.message,
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-                MainState.Initial -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            modifier = Modifier.testTag("initial_message"),
-                            text = stringResource(R.string.what_book_are_you_interested_in),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-                MainState.Searching -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.testTag("progress_indicator")
-                        )
-                    }
-                }
-                is MainState.Success -> {
-                    if (currentState.books.isNotEmpty()) {
-                        LazyColumn(
-                            modifier = Modifier.testTag("books_list")
-                        ) {
-                            itemsIndexed(
-                                items = currentState.books,
-                                key = { index, book -> "${index}_${book.id}" }
-                            ) { _, book ->
-                                BookItem(
-                                    isSavedToFavourites = favouriteBooks.any {
-                                        it.id == book.id
-                                    },
-                                    title = book.title,
-                                    authors = book.authors,
-                                    thumbnail = book.thumbnail,
-                                    pageCount = book.pageCount,
-                                    averageRating = book.averageRating,
-                                    onClick = { onNavigateToDetails(book.id) },
-                                    onLongClick = {
-                                        if (!favouriteBooks.any {
+                        itemsIndexed(
+                            items = currentState.books,
+                            key = { index, book -> "${index}_${book.id}" }
+                        ) { _, book ->
+                            BookItem(
+                                isSavedToFavourites = favouriteBooks.any {
+                                    it.id == book.id
+                                },
+                                title = book.title,
+                                authors = book.authors,
+                                thumbnail = book.thumbnail,
+                                pageCount = book.pageCount,
+                                averageRating = book.averageRating,
+                                onClick = { onNavigateToDetails(book.id) },
+                                onLongClick = {
+                                    if (!favouriteBooks.any {
                                             it.id == book.id
-                                        }) viewModel.processCommand(MainCommand.SaveBookToFavourites(book))
-                                        else viewModel.processCommand(MainCommand.DeleteBookFromFavourites(book.id))
-                                    }
-                                )
-                            }
+                                        }) viewModel.processCommand(
+                                        MainCommand.SaveBookToFavourites(
+                                            book
+                                        )
+                                    )
+                                    else viewModel.processCommand(
+                                        MainCommand.DeleteBookFromFavourites(
+                                            book.id
+                                        )
+                                    )
+                                }
+                            )
+                        }
 
-                            if (currentState.hasMorePages) {
-                                item {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 12.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        if (currentState.isLoadingNextPage) {
-                                            CircularProgressIndicator()
-                                        } else {
-                                            Button(
-                                                onClick = {
-                                                    viewModel.processCommand(MainCommand.LoadNextPage)
-                                                }
-                                            ) {
-                                                Text(text = stringResource(R.string.load_more))
+                        if (currentState.hasMorePages) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 12.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (currentState.isLoadingNextPage) {
+                                        CircularProgressIndicator()
+                                    } else {
+                                        Button(
+                                            onClick = {
+                                                viewModel.processCommand(MainCommand.LoadNextPage)
                                             }
+                                        ) {
+                                            Text(text = stringResource(R.string.load_more))
                                         }
                                     }
                                 }
                             }
                         }
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                modifier = Modifier.testTag("nothing_found_message"),
-                                text = stringResource(R.string.nothing_found),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            modifier = Modifier.testTag("nothing_found_message"),
+                            text = stringResource(R.string.nothing_found),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
             }
