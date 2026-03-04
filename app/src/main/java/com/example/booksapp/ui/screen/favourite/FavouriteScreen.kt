@@ -1,5 +1,7 @@
 package com.example.booksapp.ui.screen.favourite
 
+import android.R.attr.onClick
+import android.R.attr.thumbnail
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,7 +51,7 @@ fun FavouriteContent(
                 items = state.books,
                 key = { index, book -> "${index}_${book.id}" }
             ) { _, book ->
-                BookItem(
+                FavouriteBookItem(
                     title = book.title,
                     authors = book.authors,
                     thumbnail = book.thumbnail,
@@ -57,8 +59,7 @@ fun FavouriteContent(
                     averageRating = book.averageRating,
                     onClick = {},
                     onLongClick = {
-                    },
-                    isSavedToFavourites = true
+                    }
                 )
             }
         }
